@@ -1,0 +1,33 @@
+name: Launch EKS Cluster
+
+on:
+  pull_request:
+    types: [opened]
+
+jobs:
+  launch-eks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Launch EKS Cluster
+        uses: aws-actions/amazon-eks-create-cluster@v1
+        with:
+          name: my-cluster
+          version: ${{ inputs.eks-version }}
+          region: us-west-2
+          tags: |
+            environment=dev
+            application=my-app
+
+      - name: Output Cluster Details
+        run: |
+          echo "Cluster Endpoint: ${{ steps.launch-eks.outputs.cluster-endpoint }}"
+          echo "Cluster ARN: ${{ steps.launch-eks.outputs.cluster-arn }}"
+
+inputs:
+  eks-version:
+    description: 'The version of EKS to use'
+    required: true
+
